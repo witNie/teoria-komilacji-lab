@@ -1,0 +1,16 @@
+import sys
+from scanner import Scanner
+from parser import Mparser
+
+
+if __name__ == '__main__':
+
+    lexer = Scanner()
+    parser = Mparser()
+
+    filename = sys.argv[1] if len(sys.argv) > 1 else "ex.m"
+    with open(filename, "r") as file:
+        text = file.read()
+
+    # lexer.tokenize(text)
+    parser.parse(lexer.tokenize(text))
