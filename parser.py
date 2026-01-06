@@ -1,11 +1,8 @@
-from _ast import arguments
-
 from sly import Parser
 from scanner import Scanner
-
+import AST
 
 class Mparser(Parser):
-    # from scanner import Scanner
     tokens = Scanner.tokens
 
     debugfile = 'parser.out'
@@ -14,24 +11,32 @@ class Mparser(Parser):
 
 
     precedence = (
+        ('nonassoc', 'IFX'),
+        ('nonassoc', 'ELSE'),
+
         ('left', '+', '-'),
         ("left", 'DOTADD', 'DOTSUB'),
         ('left', '*', '/'),
         ("left", 'DOTMUL', 'DOTDIV'),
+
         ('right', 'UNEG'),
         ("left", "'"),
-
-
-        # ('right', 'UMINUS'),
     )
 
+    def error(self, p):
+        if p:
+            print(f"sly: Syntax error at line {p.lineno}, token={p.type}, value={p.value!r}")
+            self.errok()
+        else:
+            print("sly: Syntax error at EOF")
 
+    # start
 
     @_('instructions_opt')
     def program(self, p):
-        ast = p.instructions_opt
-        print(ast)
-        return p.instructions_opt
+        return AST.Program(p.instructions_opt)
+
+    # is instructions_opt
 
     @_('instructions')
     def instructions_opt(self, p):
@@ -41,77 +46,88 @@ class Mparser(Parser):
     def instructions_opt(self, p):
         return []
 
+    # is instructions
+
     @_('instructions instruction')
     def instructions(self, p):
         return p.instructions + [p.instruction]
-
 
     @_('instruction')
     def instructions(self, p):
         return [p.instruction]
 
+    # is instruction
 
-    # to finish the grammar
-    # ....
-
-
-    # instruction
+    @_('"{" instructions "}"')
+    def instruction(self, p):
+        return AST.Block(p.instructions)
 
     @_('assignment ";"')
     def instruction(self, p):
         return p.assignment
 
-    # @_('expression ";"')
-    # def instruction(self, p):
-    #     return p.expression
-
     @_('statement ";"')
     def instruction(self, p):
         return p.statement
 
-    @_('"{" instructions_opt "}"')
-    def block_body(self, p):
-        return p.instructions_opt
-
-    @_('instructions')
-    def block_body(self, p):
-        return p.instructions
-
-    @_('IF "(" condition ")" block_body')
+    @_('IF "(" condition ")" instruction %prec IFX')
     def instruction(self, p):
-        return (p[0], p.condition, p.block_body)
+        return AST.If(p.condition, p.instruction)
 
-    @_('IF "(" condition ")" block_body ELSE block_body')
+    @_('IF "(" condition ")" instruction ELSE instruction')
     def instruction(self, p):
-        return (p[0], p.condition, p.block_body0, p.ELSE, p.block_body1)
+        return AST.IfElse(p.condition, p.instruction0, p.instruction1)
 
-    @_('WHILE "(" condition ")" block_body')
+    @_('WHILE "(" condition ")" instruction')
     def instruction(self, p):
-        return (p[0], p.condition, p.block_body)
+        return AST.While(p.condition, p.instruction)
 
-    @_('FOR variable "=" range block_body')
+    @_('FOR variable "=" range_expr instruction')
     def instruction(self, p):
+        return AST.For(p.variable, p.range_expr, p.instruction)
 
-        return (p[0], p.range, p.block_body)
+    # is assignment
+
+    @_('variable "=" expression')
+    def assignment(self, p):
+        return AST.Assignment(p.variable, p.expression)
+
+    @_('variable ADDASSIGN expression')
+    def assignment(self, p):
+        return AST.CompoundAssignment('+=', p.variable, p.expression)
+
+    @_('variable SUBASSIGN expression')
+    def assignment(self, p):
+        return AST.CompoundAssignment('-=', p.variable, p.expression)
+
+    @_('variable MULASSIGN expression')
+    def assignment(self, p):
+        return AST.CompoundAssignment('*=', p.variable, p.expression)
+
+    @_('variable DIVASSIGN expression')
+    def assignment(self, p):
+        return AST.CompoundAssignment('/=', p.variable, p.expression)
 
 
     # statements
 
-    @_('BREAK', 'CONTINUE')
+    @_('BREAK')
     def statement(self, p):
-        return p[0]
+        return AST.Break()
+
+    @_('CONTINUE')
+    def statement(self, p):
+        return AST.Continue()
 
     @_('RETURN expression')
     def statement(self, p):
-        return (p[0], p.expression)
-
-    # @_('PRINT expression')
-    # def statement(self, p):
-    #     return (p[0], p.expression)
+        return AST.Return(p.expression)
 
     @_('PRINT expressions')
     def statement(self, p):
-        return (p[0], p.expressions)
+        return AST.Print(p.expressions)
+
+    # is expressions
 
     @_('expressions "," expression')
     def expressions(self, p):
@@ -121,45 +137,47 @@ class Mparser(Parser):
     def expressions(self, p):
         return [p.expression]
 
+    # is condition
 
-    @_('STRING')
-    def expression(self, p):
-        return p.STRING
+    @_('expression ">" expression')
+    def condition(self, p):
+        return AST.Condition(">", p.expression0, p.expression1)
 
-    # @_('STRING "(" STRING_LITERAL ")"')
-    # def string(self, p):
-    #     return ('string', p.STRING_LITERAL)
+    @_('expression "<" expression')
+    def condition(self, p):
+        return AST.Condition("<", p.expression0, p.expression1)
 
+    @_('expression LESSEQ expression')
+    def condition(self, p):
+        return AST.Condition("<=", p.expression0, p.expression1)
 
+    @_('expression MOREEQ expression')
+    def condition(self, p):
+        return AST.Condition(">=", p.expression0, p.expression1)
 
+    @_('expression EQUALS expression')
+    def condition(self, p):
+        return AST.Condition("==", p.expression0, p.expression1)
 
-    # assignment
+    @_('expression NOTEQ expression')
+    def condition(self, p):
+        return AST.Condition("!=", p.expression0, p.expression1)
 
-    @_('variable "=" expression')
-    def assignment(self, p):
-        return ('assign', p.variable, p.expression)
+    # is variable
 
-    @_('variable "=" expression_list')
-    def assignment(self, p):
-        return ('assign', p.variable, p.expression_list)
-
-    @_('variable ADDASSIGN expression', 'variable SUBASSIGN expression', 'variable MULASSIGN expression', 'variable DIVASSIGN expression')
-    def assignment(self, p):
-        return (p[1], p.variable, p.expression)
+    @_('ID vector')
+    def variable(self, p):
+        return AST.Variable(p.ID, p.vector)
 
     @_('ID')
     def variable(self, p):
-        return p.ID
+        return AST.Variable(p.ID)
 
-    @_('matrix')
-    def variable(self, p):
-        return p.matrix
+    # is expression
 
-    # expression
-
-    @_('function_call')
+    @_('STRING')
     def expression(self, p):
-        return p.function_call
+        return AST.StringLit(p.STRING)
 
     @_('number')
     def expression(self, p):
@@ -167,117 +185,121 @@ class Mparser(Parser):
 
     @_('ID')
     def expression(self, p):
-        return p.ID
+        return AST.Id(p.ID)
 
-    @_('expression "+" expression', 'expression "-" expression', 'expression "/" expression', 'expression "*" expression')
+    @_('expression "+" expression')
     def expression(self, p):
-        return (p[1], p.expression0, p.expression1)
+        return AST.BinOp("+", p.expression0, p.expression1)
 
-    @_('FLOATNUM')
-    def number(self, p):
-        return float(p.FLOATNUM)
+    @_('expression "-" expression')
+    def expression(self, p):
+        return AST.BinOp("-", p.expression0, p.expression1)
+
+    @_('expression "*" expression')
+    def expression(self, p):
+        return AST.BinOp("*", p.expression0, p.expression1)
+
+    @_('expression "/" expression')
+    def expression(self, p):
+        return AST.BinOp("/", p.expression0, p.expression1)
+
+    @_('expression DOTADD expression')
+    def expression(self, p):
+        return AST.BinOp(".+", p.expression0, p.expression1)
+
+    @_('expression DOTSUB expression')
+    def expression(self, p):
+        return AST.BinOp(".-", p.expression0, p.expression1)
+
+    @_('expression DOTMUL expression')
+    def expression(self, p):
+        return AST.BinOp(".*", p.expression0, p.expression1)
+
+    @_('expression DOTDIV expression')
+    def expression(self, p):
+        return AST.BinOp("./", p.expression0, p.expression1)
+
+    @_('"-" expression %prec UNEG')
+    def expression(self, p):
+        return AST.UnaryMinus(p.expression)
+
+    @_('expression "\'"')
+    def expression(self, p):
+        return AST.Transpose(p.expression)
+
+    @_('"(" expression ")"')
+    def expression(self, p):
+        return p.expression
+
+    @_('matrix')
+    def expression(self, p):
+        return p.matrix
+
+    @_('vector')
+    def expression(self, p):
+        return p.vector
+
+    # is numbers
 
     @_('INTNUM')
     def number(self, p):
-        return int(p.INTNUM)
+        return AST.IntNum(int(p.INTNUM))
 
-    # matrix creation funtions
+    @_('FLOATNUM')
+    def number(self, p):
+        return AST.FloatNum(float(p.FLOATNUM))
 
-    @_('matrix_function argument_par')
-    def function_call(self, p):
-        return (p.matrix_function, p.argument_par)
+    # is vector
 
-    @_('"(" arguments ")"')
-    def argument_par(self, p):
-        return p.arguments
+    @_('"[" numbers "]"')
+    def vector(self, p):
+        return AST.Vector(p.numbers)
 
-    @_('')
-    def arguments(self, p):
-        return []
+    @_('numbers "," number')
+    def numbers(self, p):
+        return p.numbers + [p.number]
 
-    @_('arguments "," expression')
-    def arguments(self, p):
-        return p.arguments + [p.expression]
+    @_('number')
+    def numbers(self, p):
+        return [p.number]
 
-    @_('EYE','ZEROS','ONES')
-    def matrix_function(self, p):
-        return p[0]
+    # is matrix
 
-    @_('matrix "\'" ')
-    def expression(self, p):
-        return ('transpose', p.matrix)
-
-    @_('"[" expression_list "]"')
-    def indexing(self, p):
-        return ('index', p.expression_list)
-
-    @_('matrix indexing')
+    @_('"[" vectors "]"')
     def matrix(self, p):
-        return (p.matrix, p.indexing)
+        return AST.Matrix(p.vectors)
 
-    @_('ID')
+    @_('vectors "," vector')
+    def vectors(self, p):
+        return p.vectors + [p.vector]
+
+    @_('vector')
+    def vectors(self, p):
+        return [p.vector]
+
+    @_('ZEROS "(" INTNUM ")"')
     def matrix(self, p):
-        return p.ID
+        return AST.Zeros(int(p.INTNUM))
 
-    @_('function_call')
+    @_('ONES "(" INTNUM ")"')
     def matrix(self, p):
-        return p.function_call
+        return AST.Ones(int(p.INTNUM))
 
-    @_('"(" expression ")"')
+    @_('EYE "(" INTNUM ")"')
     def matrix(self, p):
-        return p.expression
+        return AST.Eye(int(p.INTNUM))
 
-    @_('expression DOTADD expression', 'expression DOTSUB expression', 'expression DOTMUL expression', 'expression DOTDIV expression')
-    def expression(self, p):
-        return (p[1], p.expression0, p.expression1)
+    # -------- range --------
 
-    @_('expression ">" expression', 'expression "<" expression', 'expression LESSEQ expression', 'expression MOREEQ expression',
-       'expression EQUALS expression', 'expression NOTEQ expression' )
-    def condition(self, p):
-        return (p[1], p.expression0, p.expression1)
+    @_('range_value ":" range_value')
+    def range_expr(self, p):
+        return AST.Range(p.range_value0, p.range_value1)
 
-    @_('"-" expression %prec UNEG')
-    def uneg(self, p):
-        return ('-', p.expression)
+    @_('INTNUM')
+    def range_value(self, p):
+        return AST.IntNum(int(p.INTNUM))
 
-    @_('uneg')
-    def expression(self, p):
-        return p.uneg
+    @_('variable')
+    def range_value(self, p):
+        return p.variable
 
-    @_('')
-    def expression_list(self, p):
-        return []
-
-    @_('"[" expression_list "]"')
-    def expression_list(self, p):
-        return ('matrix', p.expression_list)
-
-    @_('expression_list "," expression_list ')
-    def expression_list(self, p):
-        return p.expression_list0 + p.expression_list1
-
-
-
-    @_('expression')
-    def expression_list(self, p):
-        return [p.expression]
-
-    @_('expression ":" expression')
-    def range(self, p):
-        return ('range', p.expression0, p.expression1)
-
-    @_('range')
-    def expression(self, p):
-        return p.range
-
-
-    @_('"{" instructions "}"')
-    def instruction(self, p):
-        return ('block', p.instructions)
-
-    def error(self, token):
-        if token:
-            print(f"Syntax error at token {token.type}, value {token.value!r}, line {token.lineno}")
-            self.errok()
-        else:
-            print("Syntax error at EOF")
