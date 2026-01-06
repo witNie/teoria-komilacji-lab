@@ -1,126 +1,198 @@
-def print_tree(node, indent=0):
-
-    prefix = "|  " * indent
-
-    if isinstance(node, list):
-        for elem in node:
-            print_tree(elem, indent)
-        return
-
-    if isinstance(node, (int, float)):
-        print(prefix + str(node))
-        return
-
-    if isinstance(node, str):
-        print(prefix + node)
-        return
-
-    if isinstance(node, tuple):
-        if len(node) == 0:
-            print(prefix + "EMPTY")
-            return
-
-        tag = node[0]
-
-        if tag == 'assign':
-            print(prefix + "=")
-            target = node[1]
-            expr = node[2]
-            print_tree(target, indent + 1)
-            print_tree(expr, indent + 1)
-            return
-
-        if tag in ('zeros', 'ones', 'eye'):
-            print(prefix + tag)
-            args = node[1]
-            print_tree(args, indent + 1)
-            return
-
-        if tag == 'transpose':
-            print(prefix + "TRANSPOSE")
-            print_tree(node[1], indent + 1)
-            return
-
-        if tag == 'index':
-            print(prefix + "INDEX")
-            print_tree(node[1], indent + 1)
-            return
-
-        if tag == 'matrix':
-            print(prefix + "VECTOR")
-            payload = node[1]
-
-            rows = _extract_matrix_rows(payload)
-            for row in rows:
-                print(prefix + "|  VECTOR")
-                print_tree(row, indent + 2)
-            return
-
-        if tag == 'block':
-            print_tree(node[1], indent)
-            return
-
-        if tag in ('+', '-', '*', '/', 'DOTADD', 'DOTSUB', 'DOTMUL', 'DOTDIV',
-                   '>', '<', 'LESSEQ', 'MOREEQ', 'EQUALS', 'NOTEQ', 'range'):
-            op = _map_op(tag)
-            print(prefix + op)
-            print_tree(node[1], indent + 1)
-            print_tree(node[2], indent + 1)
-            return
-
-        if isinstance(tag, str) and len(node) == 2 and isinstance(node[1], tuple) and node[1][0] == 'index':
-            print(prefix + "REF")
-            print(prefix + "|  " + tag)
-            print_tree(node[1], indent + 1)
-            return
-
-        print(prefix + str(tag))
-        for child in node[1:]:
-            print_tree(child, indent + 1)
-        return
-
-    print(prefix + repr(node))
+import AST
 
 
-def _map_op(op):
-    mapping = {
-        'DOTADD': '.+',
-        'DOTSUB': '.-',
-        'DOTMUL': '.*',
-        'DOTDIV': './',
-        'LESSEQ': '<=',
-        'MOREEQ': '>=',
-        'EQUALS': '==',
-        'NOTEQ': '!=',
-        'range': 'RANGE',
-    }
-    return mapping.get(op, op)
+def addToClass(cls):
+    def decorator(func):
+        setattr(cls, func.__name__, func)
+        return func
+    return decorator
 
 
-def _extract_matrix_rows(payload):
-    rows = []
+def _line(indent: int, text: str) -> None:
+    print("|  " * indent + str(text))
 
-    def walk(x):
-        if isinstance(x, list):
-            if all(isinstance(v, (int, float)) for v in x):
-                rows.append(x)
-            else:
-                for v in x:
-                    walk(v)
-            return
 
-        if isinstance(x, tuple):
-            if len(x) >= 2 and x[0] == 'matrix':
-                for v in x[1:]:
-                    walk(v)
-            else:
-                for v in x:
-                    walk(v)
-            return
+#  program / blocks
 
-    walk(payload)
+@addToClass(AST.Program)
+def printTree(self, indent=0):
+    for instr in self.instructions:
+        instr.printTree(indent)
 
-    if not rows and isinstance(payload, list):
-        rows = [payload]
 
-    return rows
+@addToClass(AST.Block)
+def printTree(self, indent=0):
+    for instr in self.instructions:
+        instr.printTree(indent)
+
+
+#  instructions
+
+@addToClass(AST.Assignment)
+def printTree(self, indent=0):
+    _line(indent, "=")
+    self.target.printTree(indent + 1)
+    self.value.printTree(indent + 1)
+
+
+@addToClass(AST.CompoundAssignment)
+def printTree(self, indent=0):
+    _line(indent, self.op)
+    self.target.printTree(indent + 1)
+    self.value.printTree(indent + 1)
+
+
+@addToClass(AST.Print)
+def printTree(self, indent=0):
+    _line(indent, "PRINT")
+    for e in self.args:
+        e.printTree(indent + 1)
+
+
+@addToClass(AST.Return)
+def printTree(self, indent=0):
+    _line(indent, "RETURN")
+    self.value.printTree(indent + 1)
+
+
+@addToClass(AST.Break)
+def printTree(self, indent=0):
+    _line(indent, "BREAK")
+
+
+@addToClass(AST.Continue)
+def printTree(self, indent=0):
+    _line(indent, "CONTINUE")
+
+
+@addToClass(AST.If)
+def printTree(self, indent=0):
+    _line(indent, "IF")
+    self.condition.printTree(indent + 1)
+    _line(indent, "THEN")
+    self.then_instr.printTree(indent + 1)
+
+
+@addToClass(AST.IfElse)
+def printTree(self, indent=0):
+    _line(indent, "IF")
+    self.condition.printTree(indent + 1)
+    _line(indent, "THEN")
+    self.then_instr.printTree(indent + 1)
+    _line(indent, "ELSE")
+    self.else_instr.printTree(indent + 1)
+
+
+@addToClass(AST.While)
+def printTree(self, indent=0):
+    _line(indent, "WHILE")
+    self.condition.printTree(indent + 1)
+    self.body.printTree(indent + 1)
+
+
+@addToClass(AST.For)
+def printTree(self, indent=0):
+    _line(indent, "FOR")
+    self.var.printTree(indent + 1)
+    self.range_.printTree(indent + 1)
+    self.body.printTree(indent + 1)
+
+
+#  condition / range
+
+@addToClass(AST.Condition)
+def printTree(self, indent=0):
+    _line(indent, self.op)
+    self.left.printTree(indent + 1)
+    self.right.printTree(indent + 1)
+
+
+@addToClass(AST.Range)
+def printTree(self, indent=0):
+    _line(indent, "RANGE")
+    self.start.printTree(indent + 1)
+    self.end.printTree(indent + 1)
+
+
+#  expressions
+
+@addToClass(AST.BinOp)
+def printTree(self, indent=0):
+    _line(indent, self.op)
+    self.left.printTree(indent + 1)
+    self.right.printTree(indent + 1)
+
+
+@addToClass(AST.UnaryMinus)
+def printTree(self, indent=0):
+    _line(indent, "-")
+    self.expr.printTree(indent + 1)
+
+
+@addToClass(AST.Transpose)
+def printTree(self, indent=0):
+    _line(indent, "TRANSPOSE")
+    self.expr.printTree(indent + 1)
+
+
+@addToClass(AST.Variable)
+def printTree(self, indent=0):
+    _line(indent, self.name)
+    if self.index is not None:
+        self.index.printTree(indent + 1)
+
+
+@addToClass(AST.Id)
+def printTree(self, indent=0):
+    _line(indent, self.name)
+
+
+@addToClass(AST.IntNum)
+def printTree(self, indent=0):
+    _line(indent, self.value)
+
+
+@addToClass(AST.FloatNum)
+def printTree(self, indent=0):
+    _line(indent, self.value)
+
+
+@addToClass(AST.StringLit)
+def printTree(self, indent=0):
+    _line(indent, self.value)
+
+
+#  vectors / matrices / constructors
+
+@addToClass(AST.Vector)
+def printTree(self, indent=0):
+    # If you prefer not to print "VECTOR", remove this line.
+    _line(indent, "VECTOR")
+    for item in self.items:
+        item.printTree(indent + 1)
+
+
+@addToClass(AST.Matrix)
+def printTree(self, indent=0):
+    # If you prefer not to print "MATRIX", remove this line.
+    _line(indent, "MATRIX")
+    for row in self.rows:
+        row.printTree(indent + 1)
+
+
+@addToClass(AST.Zeros)
+def printTree(self, indent=0):
+    _line(indent, "zeros")
+    _line(indent + 1, self.n)
+
+
+@addToClass(AST.Ones)
+def printTree(self, indent=0):
+    _line(indent, "ones")
+    _line(indent + 1, self.n)
+
+
+@addToClass(AST.Eye)
+def printTree(self, indent=0):
+    _line(indent, "eye")
+    _line(indent + 1, self.n)
