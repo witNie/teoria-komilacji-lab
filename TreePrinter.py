@@ -137,9 +137,14 @@ def printTree(self, indent=0):
 
 @addToClass(AST.Variable)
 def printTree(self, indent=0):
-    _line(indent, self.name)
-    if self.index is not None:
-        self.index.printTree(indent + 1)
+    if self.index_vector is not None:
+        _line(indent, "REF")
+        _line(indent+1, self.name)
+        self.index_vector.printTree(indent + 1)
+        if self.index_matrix is not None:
+            self.index_matrix.printTree(indent + 1)
+    else:
+        _line(indent, self.name)
 
 
 @addToClass(AST.Id)

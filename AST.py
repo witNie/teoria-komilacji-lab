@@ -118,7 +118,8 @@ class Id(Expression):
 class Variable(Expression):
 
     name: str
-    index: Optional["Vector"] = None
+    index_vector: Optional["Vector"] = None
+    index_matrix: Optional["Vector"] = None
 
 
 @dataclass(frozen=True)

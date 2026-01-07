@@ -165,13 +165,18 @@ class Mparser(Parser):
 
     # is variable
 
-    @_('ID vector')
+    @_('ID "[" expression "]"')
     def variable(self, p):
-        return AST.Variable(p.ID, p.vector)
+        return AST.Variable(p.ID, p.expression)
+
+    @_('ID "[" expression "," expression "]"')
+    def variable(self, p):
+        return AST.Variable(p.ID, p.expression0, p.expression1)
 
     @_('ID')
     def variable(self, p):
         return AST.Variable(p.ID)
+
 
     # is expression
 
