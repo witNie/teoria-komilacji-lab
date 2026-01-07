@@ -183,9 +183,9 @@ class Mparser(Parser):
     def expression(self, p):
         return p.number
 
-    @_('ID')
+    @_('variable')
     def expression(self, p):
-        return AST.Id(p.ID)
+        return p.variable
 
     @_('expression "+" expression')
     def expression(self, p):

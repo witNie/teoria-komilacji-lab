@@ -45,7 +45,7 @@ Rule 41    expression -> expression / expression  [precedence=left, level=5]
 Rule 42    expression -> expression * expression  [precedence=left, level=5]
 Rule 43    expression -> expression - expression  [precedence=left, level=3]
 Rule 44    expression -> expression + expression  [precedence=left, level=3]
-Rule 45    expression -> ID
+Rule 45    expression -> variable
 Rule 46    expression -> number
 Rule 47    expression -> STRING
 Rule 48    number -> FLOATNUM
@@ -91,7 +91,7 @@ EQUALS               : 25
 EYE                  : 53
 FLOATNUM             : 48
 FOR                  : 6
-ID                   : 30 31 45
+ID                   : 30 31
 IF                   : 8 9
 INTNUM               : 49 53 54 55 61
 LESSEQ               : 27
@@ -127,7 +127,7 @@ program              : 0
 range_expr           : 6
 range_value          : 59 59
 statement            : 10
-variable             : 6 13 14 15 16 17 60
+variable             : 6 13 14 15 16 17 45 60
 vector               : 31 32 57 58
 vectors              : 56 58
 
@@ -347,7 +347,7 @@ state 12
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -355,16 +355,18 @@ state 12
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
@@ -372,6 +374,7 @@ state 12
     expression                     shift and go to state 30
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 13
@@ -390,7 +393,7 @@ state 13
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -398,22 +401,25 @@ state 13
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 44
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 14
@@ -438,6 +444,24 @@ state 16
     SUBASSIGN       reduce using rule 30 (variable -> ID .)
     ADDASSIGN       reduce using rule 30 (variable -> ID .)
     =               reduce using rule 30 (variable -> ID .)
+    '               reduce using rule 30 (variable -> ID .)
+    DOTDIV          reduce using rule 30 (variable -> ID .)
+    DOTMUL          reduce using rule 30 (variable -> ID .)
+    DOTSUB          reduce using rule 30 (variable -> ID .)
+    DOTADD          reduce using rule 30 (variable -> ID .)
+    /               reduce using rule 30 (variable -> ID .)
+    *               reduce using rule 30 (variable -> ID .)
+    -               reduce using rule 30 (variable -> ID .)
+    +               reduce using rule 30 (variable -> ID .)
+    ,               reduce using rule 30 (variable -> ID .)
+    ;               reduce using rule 30 (variable -> ID .)
+    NOTEQ           reduce using rule 30 (variable -> ID .)
+    EQUALS          reduce using rule 30 (variable -> ID .)
+    MOREEQ          reduce using rule 30 (variable -> ID .)
+    LESSEQ          reduce using rule 30 (variable -> ID .)
+    <               reduce using rule 30 (variable -> ID .)
+    >               reduce using rule 30 (variable -> ID .)
+    )               reduce using rule 30 (variable -> ID .)
     :               reduce using rule 30 (variable -> ID .)
     FOR             reduce using rule 30 (variable -> ID .)
     WHILE           reduce using rule 30 (variable -> ID .)
@@ -490,7 +514,7 @@ state 19
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -498,19 +522,22 @@ state 19
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
+    variable                       shift and go to state 35
     expression                     shift and go to state 48
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
@@ -532,7 +559,7 @@ state 20
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -540,19 +567,22 @@ state 20
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
+    variable                       shift and go to state 35
     expression                     shift and go to state 49
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
@@ -574,7 +604,7 @@ state 21
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -582,19 +612,22 @@ state 21
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
+    variable                       shift and go to state 35
     expression                     shift and go to state 50
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
@@ -616,7 +649,7 @@ state 22
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -624,19 +657,22 @@ state 22
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
+    variable                       shift and go to state 35
     expression                     shift and go to state 51
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
@@ -658,7 +694,7 @@ state 23
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -666,19 +702,22 @@ state 23
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
+    variable                       shift and go to state 35
     expression                     shift and go to state 52
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
@@ -706,7 +745,7 @@ state 24
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -714,16 +753,18 @@ state 24
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
@@ -731,6 +772,7 @@ state 24
     expression                     shift and go to state 54
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 25
@@ -756,7 +798,7 @@ state 25
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -764,16 +806,18 @@ state 25
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
@@ -781,6 +825,7 @@ state 25
     expression                     shift and go to state 54
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 26
@@ -950,7 +995,7 @@ state 33
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -958,22 +1003,25 @@ state 33
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 67
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 34
@@ -992,7 +1040,7 @@ state 34
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -1000,45 +1048,48 @@ state 34
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 68
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 35
 
-    (45) expression -> ID .
-    '               reduce using rule 45 (expression -> ID .)
-    DOTDIV          reduce using rule 45 (expression -> ID .)
-    DOTMUL          reduce using rule 45 (expression -> ID .)
-    DOTSUB          reduce using rule 45 (expression -> ID .)
-    DOTADD          reduce using rule 45 (expression -> ID .)
-    /               reduce using rule 45 (expression -> ID .)
-    *               reduce using rule 45 (expression -> ID .)
-    -               reduce using rule 45 (expression -> ID .)
-    +               reduce using rule 45 (expression -> ID .)
-    ,               reduce using rule 45 (expression -> ID .)
-    ;               reduce using rule 45 (expression -> ID .)
-    NOTEQ           reduce using rule 45 (expression -> ID .)
-    EQUALS          reduce using rule 45 (expression -> ID .)
-    MOREEQ          reduce using rule 45 (expression -> ID .)
-    LESSEQ          reduce using rule 45 (expression -> ID .)
-    <               reduce using rule 45 (expression -> ID .)
-    >               reduce using rule 45 (expression -> ID .)
-    )               reduce using rule 45 (expression -> ID .)
+    (45) expression -> variable .
+    '               reduce using rule 45 (expression -> variable .)
+    DOTDIV          reduce using rule 45 (expression -> variable .)
+    DOTMUL          reduce using rule 45 (expression -> variable .)
+    DOTSUB          reduce using rule 45 (expression -> variable .)
+    DOTADD          reduce using rule 45 (expression -> variable .)
+    /               reduce using rule 45 (expression -> variable .)
+    *               reduce using rule 45 (expression -> variable .)
+    -               reduce using rule 45 (expression -> variable .)
+    +               reduce using rule 45 (expression -> variable .)
+    ,               reduce using rule 45 (expression -> variable .)
+    ;               reduce using rule 45 (expression -> variable .)
+    NOTEQ           reduce using rule 45 (expression -> variable .)
+    EQUALS          reduce using rule 45 (expression -> variable .)
+    MOREEQ          reduce using rule 45 (expression -> variable .)
+    LESSEQ          reduce using rule 45 (expression -> variable .)
+    <               reduce using rule 45 (expression -> variable .)
+    >               reduce using rule 45 (expression -> variable .)
+    )               reduce using rule 45 (expression -> variable .)
 
 
 state 36
@@ -1205,6 +1256,24 @@ state 45
     SUBASSIGN       reduce using rule 31 (variable -> ID vector .)
     ADDASSIGN       reduce using rule 31 (variable -> ID vector .)
     =               reduce using rule 31 (variable -> ID vector .)
+    '               reduce using rule 31 (variable -> ID vector .)
+    DOTDIV          reduce using rule 31 (variable -> ID vector .)
+    DOTMUL          reduce using rule 31 (variable -> ID vector .)
+    DOTSUB          reduce using rule 31 (variable -> ID vector .)
+    DOTADD          reduce using rule 31 (variable -> ID vector .)
+    /               reduce using rule 31 (variable -> ID vector .)
+    *               reduce using rule 31 (variable -> ID vector .)
+    -               reduce using rule 31 (variable -> ID vector .)
+    +               reduce using rule 31 (variable -> ID vector .)
+    ,               reduce using rule 31 (variable -> ID vector .)
+    ;               reduce using rule 31 (variable -> ID vector .)
+    NOTEQ           reduce using rule 31 (variable -> ID vector .)
+    EQUALS          reduce using rule 31 (variable -> ID vector .)
+    MOREEQ          reduce using rule 31 (variable -> ID vector .)
+    LESSEQ          reduce using rule 31 (variable -> ID vector .)
+    <               reduce using rule 31 (variable -> ID vector .)
+    >               reduce using rule 31 (variable -> ID vector .)
+    )               reduce using rule 31 (variable -> ID vector .)
     :               reduce using rule 31 (variable -> ID vector .)
     FOR             reduce using rule 31 (variable -> ID vector .)
     WHILE           reduce using rule 31 (variable -> ID vector .)
@@ -1445,7 +1514,7 @@ state 57
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -1453,22 +1522,25 @@ state 57
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 88
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 58
@@ -1510,7 +1582,7 @@ state 59
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -1518,22 +1590,25 @@ state 59
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 89
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 60
@@ -1552,7 +1627,7 @@ state 60
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -1560,22 +1635,25 @@ state 60
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 90
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 61
@@ -1594,7 +1672,7 @@ state 61
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -1602,22 +1680,25 @@ state 61
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 91
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 62
@@ -1636,7 +1717,7 @@ state 62
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -1644,22 +1725,25 @@ state 62
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 92
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 63
@@ -1678,7 +1762,7 @@ state 63
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -1686,22 +1770,25 @@ state 63
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 93
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 64
@@ -1720,7 +1807,7 @@ state 64
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -1728,22 +1815,25 @@ state 64
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 94
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 65
@@ -1762,7 +1852,7 @@ state 65
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -1770,22 +1860,25 @@ state 65
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 95
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 66
@@ -1804,7 +1897,7 @@ state 66
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -1812,22 +1905,25 @@ state 66
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 96
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 67
@@ -2058,7 +2154,7 @@ state 81
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -2066,22 +2162,25 @@ state 81
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 108
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 82
@@ -2100,7 +2199,7 @@ state 82
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -2108,22 +2207,25 @@ state 82
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 109
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 83
@@ -2142,7 +2244,7 @@ state 83
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -2150,22 +2252,25 @@ state 83
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 110
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 84
@@ -2184,7 +2289,7 @@ state 84
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -2192,22 +2297,25 @@ state 84
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 111
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 85
@@ -2226,7 +2334,7 @@ state 85
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -2234,22 +2342,25 @@ state 85
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 112
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 86
@@ -2268,7 +2379,7 @@ state 86
     (42) expression -> . expression * expression
     (43) expression -> . expression - expression
     (44) expression -> . expression + expression
-    (45) expression -> . ID
+    (45) expression -> . variable
     (46) expression -> . number
     (47) expression -> . STRING
     (50) vector -> . [ numbers ]
@@ -2276,22 +2387,25 @@ state 86
     (54) matrix -> . ONES ( INTNUM )
     (55) matrix -> . ZEROS ( INTNUM )
     (56) matrix -> . [ vectors ]
+    (30) variable -> . ID
+    (31) variable -> . ID vector
     (48) number -> . FLOATNUM
     (49) number -> . INTNUM
     (               shift and go to state 33
     -               shift and go to state 34
-    ID              shift and go to state 35
     STRING          shift and go to state 37
     [               shift and go to state 38
     EYE             shift and go to state 39
     ONES            shift and go to state 41
     ZEROS           shift and go to state 42
+    ID              shift and go to state 16
     FLOATNUM        shift and go to state 43
     INTNUM          shift and go to state 40
 
     expression                     shift and go to state 113
     vector                         shift and go to state 31
     matrix                         shift and go to state 32
+    variable                       shift and go to state 35
     number                         shift and go to state 36
 
 state 87
@@ -2654,6 +2768,13 @@ state 98
     SUBASSIGN       reduce using rule 50 (vector -> [ numbers ] .)
     ADDASSIGN       reduce using rule 50 (vector -> [ numbers ] .)
     =               reduce using rule 50 (vector -> [ numbers ] .)
+    NOTEQ           reduce using rule 50 (vector -> [ numbers ] .)
+    EQUALS          reduce using rule 50 (vector -> [ numbers ] .)
+    MOREEQ          reduce using rule 50 (vector -> [ numbers ] .)
+    LESSEQ          reduce using rule 50 (vector -> [ numbers ] .)
+    <               reduce using rule 50 (vector -> [ numbers ] .)
+    >               reduce using rule 50 (vector -> [ numbers ] .)
+    )               reduce using rule 50 (vector -> [ numbers ] .)
     :               reduce using rule 50 (vector -> [ numbers ] .)
     FOR             reduce using rule 50 (vector -> [ numbers ] .)
     WHILE           reduce using rule 50 (vector -> [ numbers ] .)
@@ -2664,13 +2785,6 @@ state 98
     CONTINUE        reduce using rule 50 (vector -> [ numbers ] .)
     BREAK           reduce using rule 50 (vector -> [ numbers ] .)
     ID              reduce using rule 50 (vector -> [ numbers ] .)
-    NOTEQ           reduce using rule 50 (vector -> [ numbers ] .)
-    EQUALS          reduce using rule 50 (vector -> [ numbers ] .)
-    MOREEQ          reduce using rule 50 (vector -> [ numbers ] .)
-    LESSEQ          reduce using rule 50 (vector -> [ numbers ] .)
-    <               reduce using rule 50 (vector -> [ numbers ] .)
-    >               reduce using rule 50 (vector -> [ numbers ] .)
-    )               reduce using rule 50 (vector -> [ numbers ] .)
     ]               reduce using rule 50 (vector -> [ numbers ] .)
 
 

@@ -58,9 +58,27 @@ class TypeChecker:
 
     def visit_Variable(self, node):
         symbol = self.symbol_table.get(node.name)
+        if symbol.type == self.MATRIX:
+            if len(node.index.items) == 2:
+                if node.index.items[0].value < symbol.size[0] and node.index.items[0].value < symbol.size[0]:
+                    return 'IntNum' , None
+                else:
+                    print(f"Error: Index out of range")
+                    return 'IntNum', None
+            else:
+                print(f"Error: Index matrix should be len 2")
+        if symbol.type == self.VECTOR:
+            if len(node.index.items) == 1:
+                if node.inex < symbol.size:
+                    return self.FLOAT , None
+                else:
+                    print(f"Error: Index out of range")
+                    return None, None
+            else:
+                print(f"Error: Index vector should be len 1")
         if symbol is None:
             print(f"Error: Variable '{node.name}' undefined at line {getattr(node, 'lineno', '?')}")
-            return None
+            return None, None
 
         if node.index is not None:
             self.visit(node.index)
