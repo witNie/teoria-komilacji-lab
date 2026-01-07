@@ -61,10 +61,10 @@ class TypeChecker:
         if symbol.type == self.MATRIX:
             if len(node.index.items) == 2:
                 if node.index.items[0].value < symbol.size[0] and node.index.items[0].value < symbol.size[0]:
-                    return 'IntNum' , None
+                    return self.INT , None
                 else:
                     print(f"Error: Index out of range")
-                    return 'IntNum', None
+                    return None, None
             else:
                 print(f"Error: Index matrix should be len 2")
         if symbol.type == self.VECTOR:
