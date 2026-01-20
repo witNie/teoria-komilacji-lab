@@ -26,6 +26,8 @@ class SymbolTable(object):
         self.parent = parent
         self.name = name
         self.symbols = {}
+        for symbol in parent.symbols:
+            self.put(symbol.name, symbol)
     #
 
     def __str__(self):

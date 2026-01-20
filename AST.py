@@ -169,7 +169,6 @@ class Matrix(Expression):
 class Zeros(Expression):
     n: int
 
-
 @dataclass(frozen=True)
 class Ones(Expression):
     n: int

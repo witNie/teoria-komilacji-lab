@@ -45,7 +45,7 @@ class TypeChecker:
         self.visit(node.instructions)
         self.symbol_table = self.symbol_table.popScope()
 
-    # --- Typy Proste ---
+    # --- Typy ---
 
     def visit_IntNum(self, node):
         return self.INT, None
@@ -58,27 +58,31 @@ class TypeChecker:
 
     def visit_Variable(self, node):
         symbol = self.symbol_table.get(node.name)
-        if symbol.type == self.MATRIX:
-            if len(node.index.items) == 2:
-                if node.index.items[0].value < symbol.size[0] and node.index.items[0].value < symbol.size[0]:
-                    return self.INT , None
-                else:
-                    print(f"Error: Index out of range")
-                    return None, None
-            else:
-                print(f"Error: Index matrix should be len 2")
-        if symbol.type == self.VECTOR:
-            if len(node.index.items) == 1:
-                if node.inex < symbol.size:
-                    return self.FLOAT , None
-                else:
-                    print(f"Error: Index out of range")
-                    return None, None
-            else:
-                print(f"Error: Index vector should be len 1")
         if symbol is None:
             print(f"Error: Variable '{node.name}' undefined at line {getattr(node, 'lineno', '?')}")
             return None, None
+        if symbol.type == self.MATRIX:
+            if node.index:
+                if len(node.index.items) == 2:
+                    if node.index.items[0].value < symbol.size[0] and node.index.items[0].value < symbol.size[0]:
+                        return self.INT , None
+                    else:
+                        print(f"Error: Index out of range")
+                        return None, None
+                else:
+                    print(f"Error: Index matrix should be len 2")
+            return self.MATRIX, symbol.size
+        if symbol.type == self.VECTOR:
+            if node.index:
+                if len(node.index.items) == 1:
+                    if node.inex < symbol.size:
+                        return self.FLOAT , None
+                    else:
+                        print(f"Error: Index out of range")
+                        return None, None
+                else:
+                    print(f"Error: Index vector should be len 1")
+
 
         if node.index is not None:
             self.visit(node.index)
@@ -90,7 +94,7 @@ class TypeChecker:
         symbol = self.symbol_table.get(name)
         return symbol.type, symbol.size
 
-    # --- Operacje i Wyrażenia ---
+    # --- Operacje ---
 
     def visit_UnaryMinus(self, node):
         type, size = self.visit(node.expr)
@@ -153,7 +157,7 @@ class TypeChecker:
             print("Error: Transpose can only be applied to a matrix")
         return self.MATRIX, (size[1], size[0])
 
-    # --- Przypisania ---
+    # --- Przypisanie ---
 
     def visit_Assignment(self, node):
         # print(f'Debug : {self.visit(node.value)}')
@@ -171,8 +175,10 @@ class TypeChecker:
     def visit_While(self, node):
         self.visit(node.condition)
         self.loop_level += 1
+        self.symbol_table = SymbolTable(self.symbol_table, 'while')
         self.visit(node.body)
         self.loop_level -= 1
+        self.symbol_table = self.symbol_table.parent
 
         return None, None
 
@@ -180,9 +186,11 @@ class TypeChecker:
         self.visit(node.range_)
         self.symbol_table.put(node.var.name, Symbol(node.var.name, 'int', None))
 
+        self.symbol_table = SymbolTable(self.symbol_table,'for')
         self.loop_level += 1
         self.visit(node.body)
         self.loop_level -= 1
+        self.symbol_table = self.symbol_table.parent
 
         return None, None
 

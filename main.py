@@ -27,8 +27,8 @@ if __name__ == '__main__':
 
     typeChecker = TypeChecker()
     typeChecker.visit(ast)
-    print(typeChecker.symbol_table)
+    # print(typeChecker.symbol_table)
 
 
-    typeChecker = TypeChecker()
-    typeChecker.visit(ast)
+    # typeChecker = TypeChecker()
+    # typeChecker.visit(ast)
