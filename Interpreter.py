@@ -26,6 +26,7 @@ class Interpreter(object):
             instruction.accept(self)
 
 
+
     @when(AST.BinOp)
     def visit(self, node):
         r1 = node.left.accept(self)
@@ -36,6 +37,7 @@ class Interpreter(object):
             "-": operator.sub,
             "*": operator.mul,
             "/": operator.truediv,
+            # ".+": lambda a, b: for i in a + b,
         }
         # print(node.left, node.right)
         # for m in self.memStack.stack:
@@ -167,12 +169,14 @@ class Interpreter(object):
         # var = node.var.accept(self)
         range_ = node.range_.accept(self)
         # print(f'Debug {node.var.name}')
+        self.memStack.insert(node.var.name, 0)
         for v in range_:
-            self.memStack.insert(node.var.name, v)
+            self.memStack.set(node.var.name, v)
             # for m in self.memStack.stack:
             #     print(m.data)
             node.body.accept(self)
         self.memStack.pop()
+        # print("OK FOR")
 
 
     @when(AST.If)
@@ -201,6 +205,7 @@ class Interpreter(object):
         val = [node.args[i].accept(self) for i in range(len(node.args))]
         # print(val)
         print(*(arg.accept(self) for arg in node.args))
+        # print("OK PRINT")
         return None
 
     @when(AST.Return)
@@ -211,11 +216,13 @@ class Interpreter(object):
 
     @when(AST.Break)
     def visit(self, node):
-        raise BreakException()
+        if len(self.memStack.stack) < 2:
+            raise BreakException()
 
     @when(AST.Continue)
     def visit(self, node):
-        raise ContinueException()
+        if len(self.memStack.stack) < 2:
+            raise ContinueException()
 
     @when(AST.Block)
     def visit(self, node):
