@@ -169,12 +169,15 @@ class Matrix(Expression):
 @dataclass(frozen=True)
 class Zeros(Expression):
     n: int
+    n2: Optional[int] = None
 
 @dataclass(frozen=True)
 class Ones(Expression):
     n: int
-
+    n2: Optional[int] = None
 
 @dataclass(frozen=True)
 class Eye(Expression):
     n: int
+    n2: Optional[int] = None
+
