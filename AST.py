@@ -5,8 +5,9 @@ from typing import List, Optional
 # base
 
 class Node:
-    """Tutaj dodawaj swoje"""
-    pass
+    def accept(self, visitor):
+        return visitor.visit(self)
+
 
 
 #  program / instructions
