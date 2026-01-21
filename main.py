@@ -6,6 +6,7 @@ from scanner import Scanner
 from mparser import Mparser
 from AST import *
 from TypeChecker import *
+from Interpreter import *
 
 if __name__ == '__main__':
 
@@ -28,6 +29,8 @@ if __name__ == '__main__':
     typeChecker = TypeChecker()
     typeChecker.visit(ast)
     # print(typeChecker.symbol_table)
+
+    ast.accept(Interpreter())
 
 
     # typeChecker = TypeChecker()

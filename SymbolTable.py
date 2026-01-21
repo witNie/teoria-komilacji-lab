@@ -7,6 +7,13 @@ class Symbol:
         self.type = type
         self.size = size
 
+        self.INT = 'int'
+        self.FLOAT = 'float'
+        self.STR = 'string'
+        self.MATRIX = 'matrix'
+        self.VECTOR = 'vector'
+        self.BOOL = 'boolean'
+
     def __str__(self):
         return f"Symbol(name={self.name}, type={self.type}, size={self.size})"
 
@@ -26,8 +33,9 @@ class SymbolTable(object):
         self.parent = parent
         self.name = name
         self.symbols = {}
-        for symbol in parent.symbols:
-            self.put(symbol.name, symbol)
+        if parent:
+            for name, symbol in parent.symbols.items():
+                self.put(name, symbol)
     #
 
     def __str__(self):

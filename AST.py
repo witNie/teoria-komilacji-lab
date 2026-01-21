@@ -5,8 +5,9 @@ from typing import List, Optional
 # base
 
 class Node:
-    """Tutaj dodawaj swoje"""
-    pass
+    def accept(self, visitor):
+        return visitor.visit(self)
+
 
 
 #  program / instructions
@@ -168,12 +169,15 @@ class Matrix(Expression):
 @dataclass(frozen=True)
 class Zeros(Expression):
     n: int
+    n2: Optional[int] = None
 
 @dataclass(frozen=True)
 class Ones(Expression):
     n: int
-
+    n2: Optional[int] = None
 
 @dataclass(frozen=True)
 class Eye(Expression):
     n: int
+    n2: Optional[int] = None
+
