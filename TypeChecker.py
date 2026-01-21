@@ -35,7 +35,6 @@ class TypeChecker:
                 elif isinstance(value, AST.Node):
                     self.visit(value)
 
-    # --- Program i Bloki ---
 
     def visit_Program(self, node):
         self.visit(node.instructions)
@@ -45,7 +44,6 @@ class TypeChecker:
         self.visit(node.instructions)
         self.symbol_table = self.symbol_table.popScope()
 
-    # --- Typy ---
 
     def visit_IntNum(self, node):
         return self.INT, None
@@ -94,7 +92,6 @@ class TypeChecker:
         symbol = self.symbol_table.get(name)
         return symbol.type, symbol.size
 
-    # --- Operacje ---
 
     def visit_UnaryMinus(self, node):
         type, size = self.visit(node.expr)
@@ -109,7 +106,6 @@ class TypeChecker:
         # print(f'Bin OP : left: {left_type}, right: {right_type}')
         op = node.op
 
-        # Operatory macierzowe (.+, .-, .*, ./)
         if op in ['.+', '.-', '.*', './']:
             if left_type != self.MATRIX or right_type != self.MATRIX:
                 print(f"Error: Operator {op} requires matrix operands")
@@ -125,7 +121,6 @@ class TypeChecker:
                     return None, None
                 return self.MATRIX, (left_size[1], right_size[0])
 
-        # Standardowe operatory (+, -, *, /)
         if left_type == self.STR and op == '+' and right_type == self.STR:
             return self.STR, left_size + right_size
 
@@ -135,7 +130,6 @@ class TypeChecker:
 
             return (self.FLOAT, None) if (left_type == self.FLOAT or right_type == self.FLOAT) else (self.INT, None)
 
-        # Mnożenie macierzy przez skalar
         if op == '*':
             # if left_type == self.MATRIX and right_type == self.MATRIX: return self.MATRIX,
             if left_type == self.MATRIX and right_type in [self.INT, self.FLOAT]:
@@ -157,7 +151,6 @@ class TypeChecker:
             print("Error: Transpose can only be applied to a matrix")
         return self.MATRIX, (size[1], size[0])
 
-    # --- Przypisanie ---
 
     def visit_Assignment(self, node):
         # print(f'Debug : {self.visit(node.value)}')
@@ -170,7 +163,6 @@ class TypeChecker:
 
         return rhs_type, rhs_size
 
-    # --- Pętle i Sterowanie ---
 
     def visit_While(self, node):
         self.visit(node.condition)
@@ -206,7 +198,6 @@ class TypeChecker:
 
         return None, None
 
-    # --- Macierze i Wektory ---
 
     def visit_Zeros(self, node):
         return self.VECTOR, node.n

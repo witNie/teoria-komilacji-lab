@@ -1,5 +1,5 @@
 A = eye(3);
-B = ones(3);
+B = eye(3);
 C = A .+ B;
 print C;
 

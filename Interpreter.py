@@ -37,7 +37,9 @@ class Interpreter(object):
             "-": operator.sub,
             "*": operator.mul,
             "/": operator.truediv,
-            # ".+": lambda a, b: for i in a + b,
+            ".+": lambda A, B: [[a + b for a, b in zip(rowA, rowB)] for rowA, rowB in zip(A, B)],
+            ".-": lambda A, B: [[a - b for a, b in zip(rowA, rowB)] for rowA, rowB in zip(A, B)],
+
         }
         # print(node.left, node.right)
         # for m in self.memStack.stack:
@@ -52,8 +54,17 @@ class Interpreter(object):
     def visit(self, node):
         var = node.target.accept(self)
         value = node.value.accept(self)
+        x = self.memStack.get(node.target.name)
         if self.memStack.get(node.target.name):
-            self.memStack.set(node.target.name, value)
+            if len(x) > 1:
+                if len(x[0]) > 1:
+                    x[node.target.index.items[0].accept(self)][node.target.index.items[1].accept(self)] = value
+                    self.memStack.set(node.target.name, x)
+                else:
+                    x[node.target.index.accept(self)] = value
+                    self.memStack.set(node.target.name, x)
+            else:
+                self.memStack.set(node.target.name, value)
         else:
             self.memStack.insert(node.target.name, value)
 
