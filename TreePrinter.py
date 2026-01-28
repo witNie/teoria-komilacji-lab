@@ -184,15 +184,21 @@ def printTree(self, indent=0):
 def printTree(self, indent=0):
     _line(indent, "zeros")
     _line(indent + 1, self.n)
+    if self.n2:
+        _line(indent + 1, self.n2)
 
 
 @addToClass(AST.Ones)
 def printTree(self, indent=0):
     _line(indent, "ones")
     _line(indent + 1, self.n)
+    if self.n2:
+        _line(indent + 1, self.n2)
 
 
 @addToClass(AST.Eye)
 def printTree(self, indent=0):
     _line(indent, "eye")
     _line(indent + 1, self.n)
+    if self.n2:
+        _line(indent + 1, self.n2)
