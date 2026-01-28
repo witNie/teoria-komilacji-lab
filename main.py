@@ -11,7 +11,7 @@ from Interpreter import *
 if __name__ == '__main__':
 
     BASE_DIR = Path(__file__).resolve().parent
-    DEFAULT_FILE = BASE_DIR / "lab2" / "example3.m"
+    DEFAULT_FILE = BASE_DIR / "lab4" / "control_transfer.m"
 
     try:
         filename = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_FILE

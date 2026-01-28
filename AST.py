@@ -4,6 +4,7 @@ from typing import List, Optional
 
 # base
 
+@dataclass(frozen=True)
 class Node:
     lineno : int
     def accept(self, visitor):

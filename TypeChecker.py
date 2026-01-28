@@ -65,10 +65,10 @@ class TypeChecker:
                     if node.index.items[0].value < symbol.size[0] and node.index.items[0].value < symbol.size[0]:
                         return self.INT , None
                     else:
-                        print(f"Error: Index out of range")
+                        print(f"Error: Index out of range at line {getattr(node, 'lineno', '?')}")
                         return None, None
                 else:
-                    print(f"Error: Index matrix should be len 2")
+                    print(f"Error: Index matrix should be len 2 at line {getattr(node, 'lineno', '?')}")
             return self.MATRIX, symbol.size
         if symbol.type == self.VECTOR:
             if node.index:
@@ -76,10 +76,10 @@ class TypeChecker:
                     if node.inex < symbol.size:
                         return self.FLOAT , None
                     else:
-                        print(f"Error: Index out of range")
+                        print(f"Error: Index out of range at line {getattr(node, 'lineno', '?')}")
                         return None, None
                 else:
-                    print(f"Error: Index vector should be len 1")
+                    print(f"Error: Index vector should be len 1 at line {getattr(node, 'lineno', '?')}")
 
 
         if node.index is not None:
@@ -108,16 +108,16 @@ class TypeChecker:
 
         if op in ['.+', '.-', '.*', './']:
             if left_type != self.MATRIX or right_type != self.MATRIX:
-                print(f"Error: Operator {op} requires matrix operands")
+                print(f"Error: Operator {op} requires matrix operands at line {getattr(node, 'lineno', '?')}")
                 return None, None
             if op in ['.+', '.-']:
                 if left_size != right_size:
-                    print(f"Error: Operator {op} matrix size mismatch")
+                    print(f"Error: Operator {op} matrix size mismatch at line {getattr(node, 'lineno', '?')}")
                     return None, None
                 return self.MATRIX, left_size
             else:
                 if left_size[1] != right_size[0]:
-                    print(f"Error: Operator {op} matrix size mismatch")
+                    print(f"Error: Operator {op} matrix size mismatch at line {getattr(node, 'lineno', '?')}")
                     return None, None
                 return self.MATRIX, (left_size[1], right_size[0])
 
@@ -139,16 +139,16 @@ class TypeChecker:
             if left_size == right_size:
                 return left_type, left_size
             else:
-                print(f"Error: Matrix size mismatch {left_size} vs {right_size}")
+                print(f"Error: Matrix size mismatch {left_size} vs {right_size} at line {getattr(node, 'lineno', '?')}")
                 return None, None
 
-        print(f"Error: Type mismatch for {op}: {left_type} and {right_type}")
+        print(f"Error: Type mismatch for {op}: {left_type} and {right_type} at line {getattr(node, 'lineno', '?')}")
         return None, None
 
     def visit_Transpose(self, node):
         type, size = self.visit(node.expr)
         if type != self.MATRIX:
-            print("Error: Transpose can only be applied to a matrix")
+            print(f"Error: Transpose can only be applied to a matrix at line {getattr(node, 'lineno', '?')}")
         return self.MATRIX, (size[1], size[0])
 
 
@@ -178,7 +178,7 @@ class TypeChecker:
         start_type, start_size = self.visit(node.start)
         end_type, end_size = self.visit(node.end)
         if not (start_type == self.INT and end_type == self.INT):
-            print(f"Error: Range start end type: {start_type} or {end_type} not integer")
+            print(f"Error: Range start end type: {start_type} or {end_type} not integer at line {getattr(node, 'lineno', '?')}")
             return None, None
 
 
@@ -197,13 +197,13 @@ class TypeChecker:
 
     def visit_Break(self, node):
         if self.loop_level == 0:
-            print("Error: 'break' used outside of loop")
+            print(f"Error: 'break' used outside of loop at line {getattr(node, 'lineno', '?')}")
 
         return None, None
 
     def visit_Continue(self, node):
         if self.loop_level == 0:
-            print("Error: 'continue' used outside of loop")
+            print(f"Error: 'continue' used outside of loop at line {getattr(node, 'lineno', '?')}")
 
         return None, None
 
@@ -235,6 +235,6 @@ class TypeChecker:
         left_type, left_size = self.visit(node.left)
         right_type, right_size = self.visit(node.right)
         if left_type != right_type:
-            print(f"Error: cond type mismatch : {left_type} and {right_type}")
+            print(f"Error: cond type mismatch : {left_type} and {right_type} at line {getattr(node, 'lineno', '?')}")
             return None, None
         return None, None
