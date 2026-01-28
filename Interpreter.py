@@ -24,8 +24,11 @@ class Interpreter(object):
     @when(AST.Program)
     def visit(self, node):
         for instruction in node.instructions:
-            instruction.accept(self)
-
+            try:
+                instruction.accept(self)
+            except ReturnValueException as e:
+                print(e.value)
+                break
 
 
     @when(AST.BinOp)
@@ -243,19 +246,19 @@ class Interpreter(object):
 
     @when(AST.Return)
     def visit(self, node):
-        value = node.expr.accept(self)
+        value = node.value.accept(self)
         raise ReturnValueException(value)
 
 
     @when(AST.Break)
     def visit(self, node):
-        if len(self.memStack.stack) < 2:
-            raise BreakException()
+        # if len(self.memStack.stack) < 2:
+        raise BreakException()
 
     @when(AST.Continue)
     def visit(self, node):
-        if len(self.memStack.stack) < 2:
-            raise ContinueException()
+        # if len(self.memStack.stack) < 2:
+        raise ContinueException()
 
     @when(AST.Block)
     def visit(self, node):
