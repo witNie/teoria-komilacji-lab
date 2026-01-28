@@ -174,6 +174,15 @@ class TypeChecker:
 
         return None, None
 
+    def visit_Range(self, node):
+        start_type, start_size = self.visit(node.start)
+        end_type, end_size = self.visit(node.end)
+        if not (start_type == self.INT and end_type == self.INT):
+            print(f"Error: Range start end type: {start_type} or {end_type} not integer")
+            return None, None
+
+
+
     def visit_For(self, node):
         self.visit(node.range_)
         self.symbol_table.put(node.var.name, Symbol(node.var.name, 'int', None))
@@ -200,9 +209,13 @@ class TypeChecker:
 
 
     def visit_Zeros(self, node):
+        if node.n2:
+            return self.MATRIX, (node.n, node.n2)
         return self.VECTOR, node.n
 
     def visit_Ones(self, node):
+        if node.n2:
+            return self.MATRIX, (node.n, node.n2)
         return self.VECTOR, node.n
 
     def visit_Eye(self, node):

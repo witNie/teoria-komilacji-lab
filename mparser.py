@@ -289,18 +289,22 @@ class Mparser(Parser):
     def matrix(self, p):
         return AST.Eye(int(p.INTNUM))
 
+    @_('ZEROS "(" INTNUM "," INTNUM ")"')
+    def matrix(self, p):
+        return AST.Zeros(int(p.INTNUM0), int(p.INTNUM1))
+
+    @_('ONES "(" INTNUM "," INTNUM ")"')
+    def matrix(self, p):
+        return AST.Ones(int(p.INTNUM0), int(p.INTNUM1))
+
+    @_('EYE "(" INTNUM "," INTNUM ")"')
+    def matrix(self, p):
+        return AST.Eye(int(p.INTNUM0), int(p.INTNUM1))
+
     # -------- range --------
 
-    @_('range_value ":" range_value')
+    @_('expression ":" expression')
     def range_expr(self, p):
-        return AST.Range(p.range_value0, p.range_value1)
-
-    @_('INTNUM')
-    def range_value(self, p):
-        return AST.IntNum(int(p.INTNUM))
-
-    @_('variable')
-    def range_value(self, p):
-        return p.variable
+        return AST.Range(p.expression0, p.expression1)
 
 

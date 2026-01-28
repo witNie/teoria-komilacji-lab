@@ -39,6 +39,9 @@ class Interpreter(object):
             "/": operator.truediv,
             ".+": lambda A, B: [[a + b for a, b in zip(rowA, rowB)] for rowA, rowB in zip(A, B)],
             ".-": lambda A, B: [[a - b for a, b in zip(rowA, rowB)] for rowA, rowB in zip(A, B)],
+            ".*": lambda A, B: [[sum(a * b for a, b in zip(rowA, colB)) for colB in zip(*B)] for rowA in A],
+            "./": lambda A, B: [[a / b for a, b in zip(rowA, rowB)] for rowA, rowB in zip(A, B)],
+
 
         }
         # print(node.left, node.right)
@@ -56,7 +59,7 @@ class Interpreter(object):
         value = node.value.accept(self)
         x = self.memStack.get(node.target.name)
         if self.memStack.get(node.target.name):
-            if len(x) > 1:
+            if type(x) not in {int, str, float} and len(x) > 1:
                 if len(x[0]) > 1:
                     x[node.target.index.items[0].accept(self)][node.target.index.items[1].accept(self)] = value
                     self.memStack.set(node.target.name, x)
@@ -132,10 +135,14 @@ class Interpreter(object):
 
     @when(AST.Zeros)
     def visit(self, node):
+        if node.n2:
+            return [[0 for _ in range(node.n2)] for _ in range(node.n)]
         return [0 for _ in range(node.n)]
 
     @when(AST.Ones)
     def visit(self, node):
+        if node.n2:
+            return [[1 for _ in range(node.n2)] for _ in range(node.n)]
         return [1 for _ in range(node.n)]
 
     @when(AST.Eye)
@@ -171,7 +178,11 @@ class Interpreter(object):
 
     @when(AST.Range)
     def visit(self, node):
-        return range(node.start.accept(self), node.end.accept(self)+1)
+        sv = node.start.accept(self)
+        ev = node.end.accept(self)
+        if sv > ev:
+            return range(sv, ev-1, -1)
+        return range(sv, ev+1)
 
     @when(AST.For)
     def visit(self, node):
@@ -181,6 +192,7 @@ class Interpreter(object):
         range_ = node.range_.accept(self)
         # print(f'Debug {node.var.name}')
         self.memStack.insert(node.var.name, 0)
+
         for v in range_:
             self.memStack.set(node.var.name, v)
             # for m in self.memStack.stack:
@@ -240,3 +252,12 @@ class Interpreter(object):
         for instruction in node.instructions:
             instruction.accept(self)
 
+    @when(AST.UnaryMinus)
+    def visit(self, node):
+        r = node.expr.accept(self)
+        return (-1) * r
+
+    @when(AST.Transpose)
+    def visit(self, node):
+        A = node.expr.accept(self)
+        return [list(col) for col in zip(*A)]

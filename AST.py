@@ -5,6 +5,7 @@ from typing import List, Optional
 # base
 
 class Node:
+    lineno : int
     def accept(self, visitor):
         return visitor.visit(self)
 
