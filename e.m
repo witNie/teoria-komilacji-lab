@@ -1,6 +1,5 @@
-
-x = eye(3);
-z = x[2,1];
-v = x[2,2];
-
-x = 0;
+a = 1;
+b = 3;
+print a;
+return a;
+print b;
