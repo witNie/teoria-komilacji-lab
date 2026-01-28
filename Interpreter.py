@@ -1,3 +1,4 @@
+from logging import raiseExceptions
 
 import AST
 import SymbolTable
@@ -197,7 +198,13 @@ class Interpreter(object):
             self.memStack.set(node.var.name, v)
             # for m in self.memStack.stack:
             #     print(m.data)
-            node.body.accept(self)
+            try:
+                node.body.accept(self)
+            except (BreakException):
+                break
+            except (ContinueException):
+                continue
+
         self.memStack.pop()
         # print("OK FOR")
 
@@ -212,7 +219,10 @@ class Interpreter(object):
         mem = Memory('while')
         self.memStack.push(mem)
         while node.condition.accept(self):
-            node.body.accept(self)
+            try:
+                node.body.accept(self)
+            except (BreakException):
+                break
         self.memStack.pop()
 
 # simplistic while loop interpretation

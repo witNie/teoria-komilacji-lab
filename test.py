@@ -1,4 +1,4 @@
-import operator
-
-a = "a"
-print(operator.mul(4,a))
+for a in range(10):
+    print(a)
+    continue
+    print(a)
